@@ -14,7 +14,7 @@ class TarefasController extends Controller
      */
     public function index()
     {
-        $tarefas = Tarefas::all();
+        $tarefas = Tarefas::where('status', 0)->get();
 
         return $tarefas;
     }
@@ -24,8 +24,15 @@ class TarefasController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $tarefa = new Tarefas();
+        $tarefa->conteudo = $request->input('conteudo');
+        $tarefa->status = $request->input('status');
+
+        $tarefa->save();
+
+        return response()->json(['mensagem' => 'Tarefa cadastrada com sucesso']);
     }
+
 
     /**
      * Display the specified resource.
@@ -50,6 +57,12 @@ class TarefasController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        try {
+            if ($id != null) {
+                Tarefas::destroy($id);
+            }
+        } catch (\Throwable $e) {
+            return $e;
+        }
     }
 }
