@@ -6,6 +6,9 @@
             },
             goToSobre() {
                 this.$router.push('/sobre')
+            }, 
+            goToTodasTarefas() {
+                this.$router.push('/todasTarefas')
             }
         }
     }
@@ -16,6 +19,9 @@
     <ul class="navbarUl">
         <li class="home" @click="goToHome">
             Home
+        </li>
+        <li class="todasTarefas" @click="goToTodasTarefas">
+            Todas Tarefas
         </li>
         <li class="sobre" @click="goToSobre">
             Sobre
@@ -44,6 +50,10 @@
 }
 
 .sobre:hover {
+    color: #F53003;
+}
+
+.todasTarefas:hover {
     color: #F53003;
 }
 </style>

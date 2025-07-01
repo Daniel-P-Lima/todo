@@ -21,7 +21,6 @@ export async function cadastrarTarefa(tarefa: ITarefa) {
 }
 
 export async function deletarTarefa(id : number) {
-    console.log(id);
     const resposta = await fetch("http://127.0.0.1:8000/api/deletarTarefa/" + id, {
         method: 'POST',
         headers: {
@@ -31,4 +30,23 @@ export async function deletarTarefa(id : number) {
     })
     
     return resposta;
+}
+
+export async function concluirTarefa(id: number) {
+  const resposta = await fetch("http://127.0.0.1:8000/api/concluirTarefa/" + id, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(id)
+  })
+
+  return resposta;
+}
+
+export async function listarTarefas() {
+  const resposta = await fetch("http://127.0.0.1:8000/api/listarTarefas")
+
+  const tarefas : ITarefa[] = await resposta.json();
+  return tarefas;
 }

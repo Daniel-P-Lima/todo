@@ -9,3 +9,5 @@ Route::get("/tarefas", [TarefasController::class, "index"]);
 Route::get("/tarefas/{id}", [TarefasController::class, "show"]);
 Route::post("/cadastrarTarefa", [TarefasController::class, "store"]);
 Route::post("/deletarTarefa/{id}", [TarefasController::class, "destroy"]);
+Route::post("/concluirTarefa/{id}", [TarefasController::class, "update"]);
+Route::get("/listarTarefas", [TarefasController::class, "listarTarefas"]);
