@@ -19,6 +19,13 @@ class TarefasController extends Controller
         return $tarefas;
     }
 
+    public function listarTarefas()
+    {
+        $tarefas = Tarefas::all();
+
+        return $tarefas;
+    }
+
     /**
      * Store a newly created resource in storage.
      */
@@ -49,7 +56,16 @@ class TarefasController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        
+        if ($id !== null) {
+            try {
+                $tarefa = Tarefas::find($id);
+                $tarefa->status = 1;
+                $tarefa->save();
+            }
+            catch (\Throwable $e) {
+                return $e;
+            }
+        }
     }
 
     /**

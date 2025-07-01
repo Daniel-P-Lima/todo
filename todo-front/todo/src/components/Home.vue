@@ -1,5 +1,5 @@
 <script lang="ts">
-import { obterTarefas, deletarTarefa } from '@/http'
+import { obterTarefas, deletarTarefa, concluirTarefa } from '@/http'
 import type ITarefa from '@/interfaces/ITarefa'
 import Botao from '@/components/Botao.vue'
 
@@ -34,6 +34,13 @@ export default {
                 this.statusTarefa = "Em andamento"
             }
             this.mostrarModal = true;
+        },
+        async concluirTarefa(tarefaId: number) {
+            await concluirTarefa(tarefaId);
+            this.mostrarModal = false;
+            
+            const tarefas = await obterTarefas();
+            this.tarefas = tarefas
         }
 
     }
@@ -44,7 +51,7 @@ export default {
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <div class="home">
         <div class="cabecalhoHome">
-            <h1>Lista de Tarefas</h1>
+            <h1>Tarefas à Fazer</h1>
             <Botao texto="Cadastrar Tarefa" @click="goToCadastrarTarefa" />
         </div>
         <ul class="listaTarefas">
@@ -55,7 +62,6 @@ export default {
                     @click="tarefa.id !== undefined && deletarTarefa(tarefa.id)">delete</span>
             </li>
         </ul>
-
 
         <div v-if="mostrarModal" class="modalOverlay">
             <div class="modal">
@@ -73,7 +79,7 @@ export default {
                     <p><strong>Status:</strong> {{ statusTarefa }}</p>
                 </div>
                 <div class="botoesModal">
-                    <Botao texto="Concluir Tarefa" />
+                    <Botao texto="Concluir Tarefa" @click="tarefaSelecionada?.id !== undefined && concluirTarefa(tarefaSelecionada?.id)"/>
                 </div>
             </div>
         </div>
