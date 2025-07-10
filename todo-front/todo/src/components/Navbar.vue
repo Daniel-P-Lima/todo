@@ -18,13 +18,13 @@
 <template>
     <ul class="navbarUl">
         <li class="home" @click="goToHome">
-            Home
+            <img src="../assets/home_icon.svg" alt="">Home
         </li>
         <li class="todasTarefas" @click="goToTodasTarefas">
-            Todas Tarefas
+            <img src="../assets/tarefa_icon.svg" alt="">Tarefas
         </li>
         <li class="sobre" @click="goToSobre">
-            Sobre
+            <img src="../assets/sobre_icon.svg" alt="">Sobre
         </li>
     </ul>
 </template>
@@ -41,6 +41,12 @@
     cursor: pointer;
 }
 
+.home {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 .home:hover {
     color: #F53003;
 }
@@ -49,11 +55,24 @@
     color: #F53003;
 }
 
+.sobre {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
 .sobre:hover {
     color: #F53003;
+}
+
+.todasTarefas{
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .todasTarefas:hover {
     color: #F53003;
 }
+
+
 </style>

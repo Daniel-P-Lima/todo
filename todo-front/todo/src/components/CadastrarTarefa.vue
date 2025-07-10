@@ -1,9 +1,11 @@
 <script lang="ts">
 import Botao from './Botao.vue';
-import { cadastrarTarefa } from '@/http'; // ajuste o caminho se necessário
+import { cadastrarTarefa } from '@/http';
+import ProgressSpinner from 'primevue/progressspinner';
+import ProgressBar from 'primevue/progressbar';
 
 export default {
-    components: { Botao },
+    components: { Botao, ProgressSpinner, ProgressBar},
     data() {
         return {
             nomeTarefa: '',
@@ -11,6 +13,8 @@ export default {
             sucesso: false,
             mensagemErro: '',
             mensagemSucesso: '',
+            valorBarra: 0,
+            mostrarSpinner: false,
         };
     },
     methods: {
@@ -24,9 +28,9 @@ export default {
             this.mensagemErro = '';
 
             try {
+                this.mostrarSpinner = true;
                 await cadastrarTarefa({ conteudo: this.nomeTarefa, status: 0 });
                 this.nomeTarefa = '';
-                this.mensagemSucesso = 'Tarefa cadastrada com sucesso!'
                 this.sucesso = true
             } catch (error) {
                 console.error(error);
@@ -35,8 +39,11 @@ export default {
 
             if (this.sucesso) {
                 setTimeout(() => {
-                    this.$router.push('/')
-                }, 1000);
+                    this.mensagemSucesso = 'Tarefa cadastrada com sucesso!'
+                }, 2000);
+                setTimeout(() => {
+                    this.$router.push('/');
+                }, 3000);
             } 
         },
 
@@ -56,11 +63,14 @@ export default {
     <div class="cardFormulario">
         <div class="formulario">
             <label for="tarefa">Tarefa</label>
-            <input :class="['tarefaFormulario', { classeErro: erro }]" type="text" id="tarefa"
-                placeholder="Digite aqui..." v-model="nomeTarefa" @input="limparErro" />
+            <div class="container-input">    
+                <input :class="['tarefaFormulario', { classeErro: erro }]" type="text" id="tarefa"
+                    placeholder="Digite aqui..." v-model="nomeTarefa" @input="limparErro" />
+                <ProgressSpinner v-if="mostrarSpinner" class="spinner"/>
+            </div>
             <span v-if="erro" class="mensagemErro">{{ mensagemErro }}</span>
             <span v-else-if="sucesso" class="mensagemSucesso">{{ mensagemSucesso }}</span>
-            <Botao texto="Salvar" @click="salvar" />
+            <Botao texto="Salvar" @click="salvar"/>
         </div>
     </div>
 </template>
@@ -86,7 +96,7 @@ export default {
     outline: none;
     border-bottom: 0.1px solid #000000;
     padding: 10px;
-    width: 40vh;
+    width: 50vh;
 }
 
 .botaoSalvarTarefa {
@@ -118,5 +128,19 @@ export default {
     margin-top: -1rem;
     color: green;
     font-size: 0.8em;
+}
+
+.container-input {
+    display: flex;
+    align-items: center;
+    width: 50vh;
+}
+.spinner {
+    --p-progressspinner-color-one: black;
+    --p-progressspinner-color-two : black;
+    --p-progressspinner-color-three : black;
+    --p-progressspinner-color-four: black;
+    height: 30px;
+    width: 25px;
 }
 </style>

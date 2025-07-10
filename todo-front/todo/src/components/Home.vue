@@ -2,17 +2,21 @@
 import { obterTarefas, deletarTarefa, concluirTarefa } from '@/http'
 import type ITarefa from '@/interfaces/ITarefa'
 import Botao from '@/components/Botao.vue'
+import ProgressBar from 'primevue/progressbar';
 
 export default {
     components: {
-        Botao
+        Botao,
+        ProgressBar
     },
     data() {
         return {
             tarefas: [] as ITarefa[],
             tarefaSelecionada: null as ITarefa | null,
             mostrarModal: false,
-            statusTarefa: ""
+            statusTarefa: "",
+            mostrarBarra: false,
+            mostrarLixeira: true,
         }
     },
     async created() {
@@ -20,13 +24,24 @@ export default {
         this.tarefas = tarefas
     },
     methods: {
+        show() {
+            this.$toast.add({ severity: 'info', summary: 'Info', detail: 'Message Content', life: 3000 });
+        },
         goToCadastrarTarefa() {
             this.$router.push('/cadastrarTarefa')
         },
         async deletarTarefa(tarefaId: number) {
+            this.mostrarBarra = true;
+
             await deletarTarefa(tarefaId);
             const tarefas = await obterTarefas();
-            this.tarefas = tarefas
+
+            setTimeout(() => {
+                this.tarefas = tarefas
+                this.mostrarLixeira = true;
+                this.mostrarBarra = false;
+            }, 2000);
+            
         },
         verTarefa(tarefa: ITarefa) {
             this.tarefaSelecionada = tarefa;
@@ -36,11 +51,17 @@ export default {
             this.mostrarModal = true;
         },
         async concluirTarefa(tarefaId: number) {
+            this.show();
             await concluirTarefa(tarefaId);
             this.mostrarModal = false;
             
             const tarefas = await obterTarefas();
             this.tarefas = tarefas
+        },
+        formatarData(data : string) {
+            const date = new Date(data);
+            const formattedDate = new Intl.DateTimeFormat('pt-BR').format(date);
+            return formattedDate
         }
 
     }
@@ -55,19 +76,20 @@ export default {
             <Botao texto="Cadastrar Tarefa" @click="goToCadastrarTarefa" />
         </div>
         <ul class="listaTarefas">
-            <li class="tarefa" v-for="tarefa in tarefas" :key="tarefa.id"
-                @click="tarefa.id !== undefined && verTarefa(tarefa)">
-                {{ tarefa.conteudo }}
-                <span class="material-icons lixo"
-                    @click="tarefa.id !== undefined && deletarTarefa(tarefa.id)">delete</span>
+            <li v-if="tarefas.length > 0" class="tarefa" v-for="tarefa in tarefas" :key="tarefa.id">
+                <div class="divTarefa" @click="tarefa.id !== undefined && verTarefa(tarefa)">
+                    {{ tarefa.conteudo }}
+                </div>
+                <span v-if="mostrarLixeira" class="material-icons lixo"
+                    @click="tarefa.id !== undefined && deletarTarefa(tarefa.id)">delete
+                </span>
             </li>
+            <ProgressBar mode="indeterminate" v-if="mostrarBarra" class="barraProgresso"/>
+            <span class="semTarefas" v-else-if="tarefas.length < 0"><img src="../assets/sobre_icon.svg" alt="">Nenhuma tarefa em andamento</span>
         </ul>
 
         <div v-if="mostrarModal" class="modalOverlay">
             <div class="modal">
-
-
-
                 <div class="headerModal">
                     <h2>Detalhes da Tarefa</h2>
                     <span class="material-icons botaoFecharModal" @click="mostrarModal = false">
@@ -77,10 +99,12 @@ export default {
                 <div class="conteudoModal">
                     <p><strong>Conteúdo:</strong> {{ tarefaSelecionada?.conteudo }}</p>
                     <p><strong>Status:</strong> {{ statusTarefa }}</p>
+                    <p><strong>Data de inclusão:</strong> {{ tarefaSelecionada?.created_at !== undefined && formatarData(tarefaSelecionada?.created_at) }}</p>
                 </div>
                 <div class="botoesModal">
                     <Botao texto="Concluir Tarefa" @click="tarefaSelecionada?.id !== undefined && concluirTarefa(tarefaSelecionada?.id)"/>
                 </div>
+                <Toast />
             </div>
         </div>
     </div>
@@ -101,17 +125,22 @@ export default {
     display: flex;
     justify-content: space-between;
     margin-bottom: 5px;
-    padding: 15px;
     border: solid 1px rgba(0, 0, 0, 0.144);
+}
+
+.divTarefa {
+    width: 100%;
+    height: 100%;
+    padding: 15px;
 }
 
 .tarefa:hover {
     cursor: pointer;
-    height: 4.5vh;
     background-color: rgba(0, 0, 0, 0.068);
 }
 
 .lixo {
+    padding: 15px;
     color: red;
 }
 
@@ -153,5 +182,19 @@ export default {
     padding: 20px;
     border-radius: 8px;
     width: 500px;
+}
+
+.semTarefas {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+
+.barraProgresso {
+    height: 5px;
+    border-radius: 5px;
+    background-color: transparent;
+    --p-progressbar-value-background: #F53003
 }
 </style>
