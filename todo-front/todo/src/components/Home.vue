@@ -3,45 +3,62 @@ import { obterTarefas, deletarTarefa, concluirTarefa } from '@/http'
 import type ITarefa from '@/interfaces/ITarefa'
 import Botao from '@/components/Botao.vue'
 import ProgressBar from 'primevue/progressbar';
-
+import Badge from 'primevue/badge';
 export default {
     components: {
         Botao,
-        ProgressBar
+        ProgressBar,
+        Badge
     },
     data() {
         return {
             tarefas: [] as ITarefa[],
+            numTarefas: 0,
             tarefaSelecionada: null as ITarefa | null,
             mostrarModal: false,
             statusTarefa: "",
-            mostrarBarra: false,
+            mostrarBarraExclusao: false,
+            mostrarBarraConclusao: false,
             mostrarLixeira: true,
+            chartData: null,
         }
     },
     async created() {
         const tarefas = await obterTarefas()
         this.tarefas = tarefas
+        this.numTarefas = tarefas.length
     },
     methods: {
-        show() {
-            this.$toast.add({ severity: 'info', summary: 'Info', detail: 'Message Content', life: 3000 });
+        sucessoTarefaConcluida() {
+            this.$toast.add({ severity: 'success', summary: 'Sucesso', detail: 'Tarefa concluída com sucesso', life: 3000});
+        },
+        sucessoTarefaExcluída() {
+            this.$toast.add({ severity: 'success', summary: 'Sucesso', detail: 'Tarefa excluída com sucesso', life: 3000});
+        },
+        erroTarefaExcluída() {
+            this.$toast.add({ severity: 'error', summary: 'Erro', detail: 'Erro ao excluir tarefa', life: 3000});
         },
         goToCadastrarTarefa() {
             this.$router.push('/cadastrarTarefa')
         },
         async deletarTarefa(tarefaId: number) {
-            this.mostrarBarra = true;
+            this.mostrarBarraExclusao = true;
 
-            await deletarTarefa(tarefaId);
-            const tarefas = await obterTarefas();
+            try {
+                await deletarTarefa(tarefaId);
+                
+                const tarefas = await obterTarefas();
+                setTimeout(() => {
+                    this.tarefas = tarefas;
+                    this.numTarefas = tarefas.length
+                    this.mostrarBarraExclusao = false;
+                    
+                    this.sucessoTarefaExcluída();
+                }, 2000);   
 
-            setTimeout(() => {
-                this.tarefas = tarefas
-                this.mostrarLixeira = true;
-                this.mostrarBarra = false;
-            }, 2000);
-            
+            } catch (error) {
+                this.erroTarefaExcluída();
+            }
         },
         verTarefa(tarefa: ITarefa) {
             this.tarefaSelecionada = tarefa;
@@ -51,19 +68,30 @@ export default {
             this.mostrarModal = true;
         },
         async concluirTarefa(tarefaId: number) {
-            this.show();
-            await concluirTarefa(tarefaId);
-            this.mostrarModal = false;
+            this.mostrarBarraConclusao = true;
+
+            try {
+                await concluirTarefa(tarefaId);
+                
+                const tarefas = await obterTarefas();
+                setTimeout(() => {   
+                    this.tarefas = tarefas
+                    this.numTarefas = tarefas.length
+                    this.mostrarBarraConclusao = false;
+                    this.mostrarModal = false;
+                    
+                    this.sucessoTarefaConcluida();
+                }, 2000);
+            } catch (error) {
+                
+            }
             
-            const tarefas = await obterTarefas();
-            this.tarefas = tarefas
         },
         formatarData(data : string) {
             const date = new Date(data);
             const formattedDate = new Intl.DateTimeFormat('pt-BR').format(date);
             return formattedDate
         }
-
     }
 }
 </script>
@@ -72,7 +100,9 @@ export default {
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <div class="home">
         <div class="cabecalhoHome">
-            <h1>Tarefas à Fazer</h1>
+            <h1 class="cabecalhoHomeHeader">Tarefas à Fazer
+                <Badge class="cabecalhoBadge" severity="info" :value="numTarefas"></Badge>
+            </h1>
             <Botao texto="Cadastrar Tarefa" @click="goToCadastrarTarefa" />
         </div>
         <ul class="listaTarefas">
@@ -84,8 +114,8 @@ export default {
                     @click="tarefa.id !== undefined && deletarTarefa(tarefa.id)">delete
                 </span>
             </li>
-            <ProgressBar mode="indeterminate" v-if="mostrarBarra" class="barraProgresso"/>
-            <span class="semTarefas" v-else-if="tarefas.length < 0"><img src="../assets/sobre_icon.svg" alt="">Nenhuma tarefa em andamento</span>
+            <ProgressBar mode="indeterminate" v-if="mostrarBarraExclusao" class="barraProgresso"/>
+            <span class="semTarefas" v-else-if="tarefas.length <= 0"><img src="../assets/sobre_icon.svg" alt="">Nenhuma tarefa em andamento</span>
         </ul>
 
         <div v-if="mostrarModal" class="modalOverlay">
@@ -104,9 +134,10 @@ export default {
                 <div class="botoesModal">
                     <Botao texto="Concluir Tarefa" @click="tarefaSelecionada?.id !== undefined && concluirTarefa(tarefaSelecionada?.id)"/>
                 </div>
-                <Toast />
+                <ProgressBar mode="indeterminate" v-if="mostrarBarraConclusao" class="barraProgresso"/>
             </div>
         </div>
+        <Toast position="bottom-right" />
     </div>
 </template>
 
@@ -117,10 +148,22 @@ export default {
     justify-content: space-between;
 }
 
+.cabecalhoHomeHeader {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.cabecalhoBadge {
+    margin-top: 5px;
+}
 .listaTarefas {
     list-style: none;
 }
 
+.p-badge-info {
+    background: #F22B02
+}
 .tarefa {
     display: flex;
     justify-content: space-between;
@@ -176,6 +219,7 @@ export default {
 .botoesModal {
     display: flex;
     justify-content: end;
+    margin-bottom: 1vh;
 }
 .modal {
     background: white;

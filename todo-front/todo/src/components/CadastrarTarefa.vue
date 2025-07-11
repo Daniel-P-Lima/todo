@@ -3,9 +3,10 @@ import Botao from './Botao.vue';
 import { cadastrarTarefa } from '@/http';
 import ProgressSpinner from 'primevue/progressspinner';
 import ProgressBar from 'primevue/progressbar';
+import FloatLabel from 'primevue/floatlabel';
 
 export default {
-    components: { Botao, ProgressSpinner, ProgressBar},
+    components: { Botao, ProgressSpinner, ProgressBar, FloatLabel},
     data() {
         return {
             nomeTarefa: '',
@@ -18,6 +19,12 @@ export default {
         };
     },
     methods: {
+        showSuccess() {
+            this.$toast.add({ severity: 'success', summary: 'Sucesso', detail: 'Tarefa cadastrada com sucesso', life: 3000});
+        },
+        showError () {
+            this.$toast.add({ severity: 'error', summary: 'Erro', detail: 'Erro ao cadastrar a tarefa', life: 3000 });
+        },
         async salvar() {
             if (this.nomeTarefa.trim() === '') {
                 this.mensagemErro = 'O nome da tarefa é obrigatório.';
@@ -34,16 +41,17 @@ export default {
                 this.sucesso = true
             } catch (error) {
                 console.error(error);
-                alert('Erro ao cadastrar tarefa');
+                this.showError();
             }
 
             if (this.sucesso) {
                 setTimeout(() => {
-                    this.mensagemSucesso = 'Tarefa cadastrada com sucesso!'
-                }, 2000);
+                    this.showSuccess();
+                    this.mostrarSpinner = false;
+                }, 3000);
                 setTimeout(() => {
                     this.$router.push('/');
-                }, 3000);
+                }, 4000);
             } 
         },
 
@@ -69,10 +77,10 @@ export default {
                 <ProgressSpinner v-if="mostrarSpinner" class="spinner"/>
             </div>
             <span v-if="erro" class="mensagemErro">{{ mensagemErro }}</span>
-            <span v-else-if="sucesso" class="mensagemSucesso">{{ mensagemSucesso }}</span>
             <Botao texto="Salvar" @click="salvar"/>
         </div>
     </div>
+    <Toast position="bottom-right"/>
 </template>
 
 
