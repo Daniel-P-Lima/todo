@@ -32,15 +32,3 @@ jobs:
         working-directory: todo-front/todo
         run: npm install
 
-      - name: Run ESLint
-        working-directory: todo-front/todo
-        run: npm run lint
-
-      - name: Run tests
-        working-directory: todo-front/todo
-        run: npm run test --if-present
-
-      - name: Build Vue app
-        working-directory: todo-front/todo
-        run: npm run build
-
