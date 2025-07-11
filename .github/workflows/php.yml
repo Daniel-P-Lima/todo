@@ -11,29 +11,27 @@ permissions:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
 
     - name: Validate composer.json and composer.lock
+      working-directory: todo-back
       run: composer validate --strict
 
     - name: Cache Composer packages
-      id: composer-cache
       uses: actions/cache@v3
       with:
-        path: vendor
-        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+        path: todo-back/vendor
+        key: ${{ runner.os }}-php-${{ hashFiles('todo-back/composer.lock') }}
         restore-keys: |
           ${{ runner.os }}-php-
 
     - name: Install dependencies
+      working-directory: todo-back
       run: composer install --prefer-dist --no-progress
 
-    # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
-    # Docs: https://getcomposer.org/doc/articles/scripts.md
-
     # - name: Run test suite
+    #   working-directory: todo-back
     #   run: composer run-script test
