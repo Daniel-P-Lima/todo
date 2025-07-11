@@ -20,15 +20,7 @@ jobs:
           node-version: 20
           cache: 'npm'
 
-      - name: Cache node modules
-        uses: actions/cache@v3
-        with:
-          path: todo-front/todo/node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('todo-front/todo/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
       - name: Install dependencies
-        working-directory: todo-front/todo/
+        working-directory: ./todo-front/todo/
         run: npm install
 
