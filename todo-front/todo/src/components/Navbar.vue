@@ -32,7 +32,9 @@
 
 <template>
     <div class="navBar">
-        <Button class="botaoMenu" @click="visible = true" label="Menu"/>
+        <Button class="botaoMenu" @click="visible = true" label="Menu">
+            <img src="../assets/menu.svg" alt="">Menu
+        </Button> 
         <Drawer v-model:visible="visible" header="Menu">
             <ul class="navbarUl">
                 <li class="home" @click="goToHome">

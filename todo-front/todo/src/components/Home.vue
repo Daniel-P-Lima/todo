@@ -4,11 +4,12 @@ import type ITarefa from '@/interfaces/ITarefa'
 import Botao from '@/components/Botao.vue'
 import ProgressBar from 'primevue/progressbar';
 import Badge from 'primevue/badge';
+
 export default {
     components: {
         Botao,
         ProgressBar,
-        Badge
+        Badge,
     },
     data() {
         return {
