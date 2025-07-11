@@ -21,6 +21,6 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        working-directory: ./todo-front/todo/
+        working-directory: todo-front/todo/
         run: npm install
 
