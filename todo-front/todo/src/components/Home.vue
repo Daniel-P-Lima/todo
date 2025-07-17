@@ -22,6 +22,7 @@ export default {
             mostrarBarraConclusao: false,
             mostrarLixeira: true,
             chartData: null,
+            dificuldadeTarefa: ""
         }
     },
     async created() {
@@ -65,6 +66,14 @@ export default {
             this.tarefaSelecionada = tarefa;
             if (tarefa.status == 0) {
                 this.statusTarefa = "Em andamento"
+            }
+            switch (tarefa.dificuldade) {
+                case 'F' : this.dificuldadeTarefa = 'Fácil';
+                break;
+                case 'M' : this.dificuldadeTarefa = 'Média';
+                break;
+                case 'D' : this.dificuldadeTarefa = 'Difícil';
+                break;
             }
             this.mostrarModal = true;
         },
@@ -131,6 +140,7 @@ export default {
                     <p><strong>Conteúdo:</strong> {{ tarefaSelecionada?.conteudo }}</p>
                     <p><strong>Status:</strong> {{ statusTarefa }}</p>
                     <p><strong>Data de inclusão:</strong> {{ tarefaSelecionada?.created_at !== undefined && formatarData(tarefaSelecionada?.created_at) }}</p>
+                    <p><strong>Dificuldade</strong> {{dificuldadeTarefa}}</p>
                 </div>
                 <div class="botoesModal">
                     <Botao texto="Concluir Tarefa" @click="tarefaSelecionada?.id !== undefined && concluirTarefa(tarefaSelecionada?.id)"/>

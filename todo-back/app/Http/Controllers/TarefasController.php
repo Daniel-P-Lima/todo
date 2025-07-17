@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Tarefas;
+use App\Enums\Dificuldade;
 use Illuminate\Http\Request;
 
 class TarefasController extends Controller
@@ -14,14 +15,16 @@ class TarefasController extends Controller
      */
     public function index()
     {
-        $tarefas = Tarefas::where('status', 0)->get();
+        $tarefas = Tarefas::where('status', 0)
+            ->orderBy('created_at')    
+            ->get();
 
         return $tarefas;
     }
 
     public function listarTarefas()
     {
-        $tarefas = Tarefas::all();
+        $tarefas = Tarefas::orderBy('status', 'DESC')->get();
 
         return $tarefas;
     }
@@ -34,7 +37,7 @@ class TarefasController extends Controller
         $tarefa = new Tarefas();
         $tarefa->conteudo = $request->input('conteudo');
         $tarefa->status = $request->input('status');
-
+        $tarefa->dificuldade = $request->input('dificuldade')['codigo'];
         $tarefa->save();
 
         return response()->json(['mensagem' => 'Tarefa cadastrada com sucesso']);

@@ -3,6 +3,7 @@ import type ITarefa from '@/interfaces/ITarefa';
 import { listarTarefas, } from '@/http'
 import Botao from './Botao.vue';
 import Knob from 'primevue/knob';
+import Chart from 'primevue/chart';
 
 export default {
 
@@ -41,7 +42,7 @@ export default {
     
     components: {
         Botao,
-        Knob
+        Knob,
     }
     }
 </script>

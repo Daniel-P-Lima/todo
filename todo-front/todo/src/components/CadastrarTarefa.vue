@@ -1,12 +1,14 @@
 <script lang="ts">
 import Botao from './Botao.vue';
 import { cadastrarTarefa } from '@/http';
-import ProgressSpinner from 'primevue/progressspinner';
 import ProgressBar from 'primevue/progressbar';
 import FloatLabel from 'primevue/floatlabel';
+import Select from 'primevue/select';
+import InputText from 'primevue/inputtext';
+
 
 export default {
-    components: { Botao, ProgressSpinner, ProgressBar, FloatLabel},
+    components: { Botao, ProgressBar, FloatLabel, Select, InputText},
     data() {
         return {
             nomeTarefa: '',
@@ -15,7 +17,13 @@ export default {
             mensagemErro: '',
             mensagemSucesso: '',
             valorBarra: 0,
-            mostrarSpinner: false,
+            mostrarBarraProgresso: false,
+            dificuldadeSelecionada: "",
+            dificuldades: [
+                {nome: 'Fácil', codigo: 'F'},
+                {nome: 'Média', codigo: 'M'},
+                {nome: 'Difícil', codigo: 'D'}
+            ]
         };
     },
     methods: {
@@ -35,8 +43,8 @@ export default {
             this.mensagemErro = '';
 
             try {
-                this.mostrarSpinner = true;
-                await cadastrarTarefa({ conteudo: this.nomeTarefa, status: 0 });
+                this.mostrarBarraProgresso = true;
+                await cadastrarTarefa({ conteudo: this.nomeTarefa, status: 0, dificuldade: this.dificuldadeSelecionada });
                 this.nomeTarefa = '';
                 this.sucesso = true
             } catch (error) {
@@ -47,11 +55,11 @@ export default {
             if (this.sucesso) {
                 setTimeout(() => {
                     this.showSuccess();
-                    this.mostrarSpinner = false;
-                }, 3000);
+                    this.mostrarBarraProgresso = false;
+                }, 2000);
                 setTimeout(() => {
                     this.$router.push('/');
-                }, 4000);
+                }, 3000);
             } 
         },
 
@@ -70,13 +78,16 @@ export default {
     <h1>Cadastrar tarefa</h1>
     <div class="cardFormulario">
         <div class="formulario">
-            <label for="tarefa">Tarefa</label>
             <div class="container-input">    
-                <input :class="['tarefaFormulario', { classeErro: erro }]" type="text" id="tarefa"
-                    placeholder="Digite aqui..." v-model="nomeTarefa" @input="limparErro" />
-                <ProgressSpinner v-if="mostrarSpinner" class="spinner"/>
+                <FloatLabel class="labelTarefa">
+                    <label for="tarefa">Tarefa</label>
+                    <InputText class="inputTarefa" id="tarefa" type="text" v-model="nomeTarefa" @input="limparErro()"/>
+                </FloatLabel>
             </div>
             <span v-if="erro" class="mensagemErro">{{ mensagemErro }}</span>
+            <Select v-model="dificuldadeSelecionada" :options="dificuldades" option-label="nome" placeholder="Selecione a dificuldade"></Select>
+            
+            <ProgressBar v-if="mostrarBarraProgresso" mode="indeterminate" class="barraProgresso"/>
             <Botao texto="Salvar" @click="salvar"/>
         </div>
     </div>
@@ -99,12 +110,8 @@ export default {
     flex-direction: column;
 }
 
-.tarefaFormulario {
-    border: none;
-    outline: none;
-    border-bottom: 0.1px solid #000000;
-    padding: 10px;
-    width: 50vh;
+.labelTarefa {
+    width: 100%;
 }
 
 .botaoSalvarTarefa {
@@ -150,5 +157,16 @@ export default {
     --p-progressspinner-color-four: black;
     height: 30px;
     width: 25px;
+}
+
+.inputTarefa {
+    width: 100%;
+}
+
+.barraProgresso {
+    height: 5px;
+    border-radius: 5px;
+    background-color: transparent;
+    --p-progressbar-value-background: #F53003
 }
 </style>
