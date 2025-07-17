@@ -3,4 +3,5 @@ export default interface ITarefa {
     conteudo: string;
     status: number;
     created_at?: string;
+    dificuldade: string;
 }
