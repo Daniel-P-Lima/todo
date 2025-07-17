@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Tarefas;
 use App\Enums\Dificuldade;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 class TarefasController extends Controller
 {
@@ -39,6 +40,13 @@ class TarefasController extends Controller
         $tarefa->status = $request->input('status');
         $tarefa->dificuldade = $request->input('dificuldade')['codigo'];
         $tarefa->save();
+
+         // Enviar para o webhook do n8n
+        Http::post('http://localhost:5678/webhook/nova-tarefa', [
+            'conteudo' => $tarefa->conteudo,
+            'status' => $tarefa->status,
+            'dificuldade' => $tarefa->dificuldade
+        ]);
 
         return response()->json(['mensagem' => 'Tarefa cadastrada com sucesso']);
     }
